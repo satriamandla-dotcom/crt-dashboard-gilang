@@ -10,7 +10,6 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import re
-from collections import Counter
 
 # =========================================================
 # PAGE CONFIG & PWC STYLE
@@ -33,187 +32,95 @@ PWC_GREY = "#7D7D7D"
 PWC_LIGHT = "#F2F2F2"
 PWC_WHITE = "#FFFFFF"
 
-# Custom CSS — PwC look & feel
 st.markdown(f"""
 <style>
-    .stApp {{
-        background-color: {PWC_WHITE};
-    }}
+    .stApp {{ background-color: {PWC_WHITE}; }}
     .main-header {{
         background: linear-gradient(90deg, {PWC_ORANGE} 0%, {PWC_DARK_ORANGE} 100%);
-        padding: 24px 32px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        color: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 24px 32px; border-radius: 8px; margin-bottom: 8px;
+        color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }}
-    .main-header h1 {{
-        color: white !important;
-        margin: 0;
-        font-size: 28px;
-        font-weight: 700;
-    }}
-    .main-header p {{
-        color: white !important;
-        margin: 4px 0 0 0;
-        font-size: 14px;
-        opacity: 0.95;
-    }}
+    .main-header h1 {{ color: white !important; margin: 0; font-size: 28px; font-weight: 700; }}
+    .main-header p {{ color: white !important; margin: 4px 0 0 0; font-size: 14px; opacity: 0.95; }}
     .section-header {{
-        background-color: {PWC_ORANGE};
-        color: white !important;
-        padding: 10px 18px;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
+        background-color: {PWC_ORANGE}; color: white !important;
+        padding: 10px 18px; border-radius: 6px; font-size: 16px; font-weight: 600;
         margin: 24px 0 12px 0;
     }}
     .section-header-dark {{
-        background-color: {PWC_DARK};
-        color: white !important;
-        padding: 10px 18px;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
+        background-color: {PWC_DARK}; color: white !important;
+        padding: 10px 18px; border-radius: 6px; font-size: 16px; font-weight: 600;
         margin: 24px 0 12px 0;
     }}
     .bio-card {{
-        background: {PWC_LIGHT};
-        padding: 14px 18px;
-        border-radius: 6px;
-        border-left: 4px solid {PWC_ORANGE};
-        margin-bottom: 8px;
+        background: {PWC_LIGHT}; padding: 14px 18px; border-radius: 6px;
+        border-left: 4px solid {PWC_ORANGE}; margin-bottom: 8px;
     }}
-    .bio-label {{
-        font-size: 11px;
-        color: {PWC_GREY};
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }}
-    .bio-value {{
-        font-size: 15px;
-        color: {PWC_DARK};
-        font-weight: 600;
-        margin: 2px 0 0 0;
-    }}
+    .bio-label {{ font-size: 11px; color: {PWC_GREY}; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }}
+    .bio-value {{ font-size: 15px; color: {PWC_DARK}; font-weight: 600; margin: 2px 0 0 0; }}
     .kpi-card {{
-        background: white;
-        padding: 16px;
-        border-radius: 8px;
-        border-top: 4px solid {PWC_ORANGE};
-        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        background: white; padding: 16px; border-radius: 8px;
+        border-top: 4px solid {PWC_ORANGE}; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         text-align: center;
     }}
-    .kpi-label {{
-        font-size: 12px;
-        color: {PWC_GREY};
-        text-transform: uppercase;
-        font-weight: 600;
-        margin: 0;
-    }}
-    .kpi-value {{
-        font-size: 30px;
-        color: {PWC_ORANGE};
-        font-weight: 700;
-        margin: 6px 0 0 0;
-        line-height: 1;
-    }}
+    .kpi-label {{ font-size: 12px; color: {PWC_GREY}; text-transform: uppercase; font-weight: 600; margin: 0; }}
+    .kpi-value {{ font-size: 30px; color: {PWC_ORANGE}; font-weight: 700; margin: 6px 0 0 0; line-height: 1; }}
     .verdict-banner {{
         background: linear-gradient(90deg, {PWC_GREEN} 0%, #1B7A52 100%);
-        color: white;
-        padding: 24px;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 22px;
-        font-weight: 700;
-        margin: 12px 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: white; padding: 24px; border-radius: 8px; text-align: center;
+        font-size: 22px; font-weight: 700; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }}
     .insight-card {{
-        background: white;
-        border: 1px solid #E5E5E5;
-        border-left: 4px solid {PWC_ORANGE};
-        padding: 12px 16px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 13px;
-        color: {PWC_DARK};
+        background: white; border: 1px solid #E5E5E5; border-left: 4px solid {PWC_ORANGE};
+        padding: 12px 16px; border-radius: 4px; margin: 8px 0; font-size: 13px; color: {PWC_DARK};
     }}
     .strength-card {{
-        background: white;
-        border-left: 4px solid {PWC_GREEN};
-        padding: 14px 18px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 13px;
-        line-height: 1.6;
+        background: white; border-left: 4px solid {PWC_GREEN};
+        padding: 14px 18px; border-radius: 4px; margin: 8px 0; font-size: 13px; line-height: 1.6;
     }}
     .improve-card {{
-        background: white;
-        border-left: 4px solid {PWC_RED};
-        padding: 14px 18px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 13px;
-        line-height: 1.6;
+        background: white; border-left: 4px solid {PWC_RED};
+        padding: 14px 18px; border-radius: 4px; margin: 8px 0; font-size: 13px; line-height: 1.6;
     }}
     .comment-down {{
-        background: #FFF4ED;
-        border-left: 4px solid {PWC_ORANGE};
-        padding: 12px 16px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 13px;
+        background: #FFF4ED; border-left: 4px solid {PWC_ORANGE};
+        padding: 12px 16px; border-radius: 4px; margin: 8px 0; font-size: 13px;
     }}
     .comment-peer {{
-        background: {PWC_LIGHT};
-        border-left: 4px solid {PWC_DARK};
-        padding: 12px 16px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 13px;
+        background: {PWC_LIGHT}; border-left: 4px solid {PWC_DARK};
+        padding: 12px 16px; border-radius: 4px; margin: 8px 0; font-size: 13px;
     }}
     .comment-meta {{
-        font-size: 11px;
-        color: {PWC_GREY};
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 6px;
+        font-size: 11px; color: {PWC_GREY}; text-transform: uppercase;
+        font-weight: 600; margin-bottom: 6px;
     }}
-    [data-testid="stSidebar"] {{
-        background-color: {PWC_DARK};
+    .empty-comment {{
+        background: #FAFAFA; border-left: 4px dashed #CCCCCC;
+        padding: 10px 14px; border-radius: 4px; margin: 6px 0; font-size: 12px;
+        color: {PWC_GREY}; font-style: italic;
     }}
-    [data-testid="stSidebar"] * {{
-        color: white !important;
+    [data-testid="stSidebar"] {{ background-color: {PWC_DARK}; }}
+    [data-testid="stSidebar"] * {{ color: white !important; }}
+    [data-testid="stSidebar"] .stSelectbox label, [data-testid="stSidebar"] .stRadio label {{
+        color: {PWC_YELLOW} !important; font-weight: 600;
     }}
-    [data-testid="stSidebar"] .stSelectbox label {{
-        color: {PWC_YELLOW} !important;
-        font-weight: 600;
-    }}
-    .stTabs [data-baseweb="tab-list"] {{
-        gap: 4px;
-    }}
+    .stTabs [data-baseweb="tab-list"] {{ gap: 4px; }}
     .stTabs [data-baseweb="tab"] {{
-        background-color: {PWC_LIGHT};
-        border-radius: 6px 6px 0 0;
-        padding: 10px 18px;
-        font-weight: 600;
+        background-color: {PWC_LIGHT}; border-radius: 6px 6px 0 0;
+        padding: 10px 18px; font-weight: 600;
     }}
     .stTabs [aria-selected="true"] {{
-        background-color: {PWC_ORANGE} !important;
-        color: white !important;
+        background-color: {PWC_ORANGE} !important; color: white !important;
     }}
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# DATA LOADING & PREPARATION
+# DATA LOADING
 # =========================================================
 @st.cache_data
-def load_data(path="Leader_Report_Extract.xlsx"):
-    df = pd.read_excel(path, sheet_name="LeaderReport")
-    me = df[df["Employee Name"].str.contains("Gilang Catur", case=False, na=False)].copy()
+def load_data(csv_path="crt_data.csv"):
+    df = pd.read_csv(csv_path).fillna("")
 
     rating_cols = [
         "Trusted Leadership: Inspire", "Trusted Leadership: Empower", "Trusted Leadership: Evolve",
@@ -224,37 +131,28 @@ def load_data(path="Leader_Report_Extract.xlsx"):
         "Almost always demonstrated these behaviours": 4,
         "Often demonstrated these behaviours": 3,
         "Sometimes demonstrated these behaviours": 2,
-        "Sometimes demonstrated": 2,
         "Acted contradictory to these behaviours": 1,
-        "Acted contradictory": 1,
     }
-
     for c in rating_cols:
-        me[c] = me[c].astype(str).str.strip().replace({"nan": np.nan})
-        me[c + "_num"] = me[c].map(rating_map)
+        df[c + "_num"] = df[c].astype(str).str.strip().map(rating_map)
 
-    def first_part(x):
-        if pd.isna(x):
-            return ""
-        return str(x).split("|")[0].strip()
-
+    # Hours numeric
     def parse_hours(x):
-        if pd.isna(x):
-            return np.nan
-        parts = re.split(r"[|,;]", str(x))
-        nums = []
-        for p in parts:
+        try:
+            return float(x)
+        except Exception:
             try:
-                nums.append(float(p.strip()))
+                parts = re.split(r"[|,;]", str(x))
+                nums = [float(p.strip()) for p in parts if p.strip().replace('.','').isdigit()]
+                return max(nums) if nums else np.nan
             except Exception:
-                pass
-        return max(nums) if nums else np.nan
+                return np.nan
 
-    me["Project_clean"] = me["Project Name"].apply(first_part)
-    me["Client_clean"] = me["Client Name"].apply(first_part)
-    me["Hours_num"] = me["Project Hours YTD at time of request"].apply(parse_hours)
+    df["Hours_num"] = df["Project Hours YTD at time of request"].apply(parse_hours)
+    df["Project_clean"] = df["Project Name"].astype(str).str.strip()
+    df["Client_clean"] = df["Client Name"].astype(str).str.strip()
 
-    return me, rating_cols
+    return df, rating_cols
 
 
 me, RATING_COLS = load_data()
@@ -271,40 +169,42 @@ PARAM_SHORT = {
 }
 
 # =========================================================
-# SIDEBAR — FILTERS
+# SIDEBAR FILTERS
 # =========================================================
 with st.sidebar:
     st.markdown("### 🎛️ DASHBOARD FILTERS")
     st.markdown("---")
-
     filter_mode = st.radio(
         "Filter by:",
         ["All Projects", "By Project", "By Client"],
         index=0,
     )
-
     selected_project = None
     selected_client = None
-
     if filter_mode == "By Project":
-        projects = sorted([p for p in down["Project_clean"].dropna().unique() if p])
+        projects = sorted([p for p in down["Project_clean"].unique() if p])
         selected_project = st.selectbox("Select Project:", projects)
     elif filter_mode == "By Client":
-        clients = sorted([c for c in down["Client_clean"].dropna().unique() if c])
+        clients = sorted([c for c in down["Client_clean"].unique() if c])
         selected_client = st.selectbox("Select Client:", clients)
 
     st.markdown("---")
+    st.markdown("### 👁️ DISPLAY OPTIONS")
+    show_empty_comments = st.checkbox(
+        "Show reviewers with no written comment",
+        value=False,
+        help="Some reviewers only filled in the rating dropdowns and skipped the written comment box."
+    )
+    st.markdown("---")
     st.markdown("### ℹ️ ABOUT")
     st.caption(
-        "Career Review Touchpoint (CRT) Dashboard — interactive review of coachee performance "
-        "based on downward and peer feedback assessments.\\n\\n"
-        "Use the filters above to drill down by project or client."
+        "Career Review Touchpoint (CRT) Dashboard — interactive review of "
+        "coachee performance based on downward and peer feedback assessments."
     )
     st.markdown("---")
     st.caption("🔒 Confidential — for Career Coach use only")
 
 
-# Apply filter to downward data
 def apply_filter(df):
     if selected_project:
         return df[df["Project_clean"] == selected_project]
@@ -335,12 +235,11 @@ bio_pairs = [
     ("Employee ID", "101548448"),
     ("Performance Year", "2026"),
     ("Global Grade", "Associate 1"),
-    ("Line of Service", str(me.iloc[0].get("Global Line of Service", "—"))),
-    ("Office Location", str(me.iloc[0].get("Office Location Common Name", "—"))),
-    ("Career Coach", str(me.iloc[0].get("Career Coach", "—"))),
-    ("Relationship Leader", str(me.iloc[0].get("Relationship Leader", "—"))),
+    ("Line of Service", "Assurance"),
+    ("Office Location", "Jakarta - Sudirman"),
+    ("Career Coach", "Satria Mandala"),
+    ("Relationship Leader", "Elvia Afkar"),
 ]
-
 cols = st.columns(4)
 for i, (label, value) in enumerate(bio_pairs):
     with cols[i % 4]:
@@ -358,11 +257,14 @@ st.markdown('<div class="section-header-dark">AT A GLANCE</div>', unsafe_allow_h
 avg_score = down_f[[c + "_num" for c in RATING_COLS]].stack().mean()
 avg_score_str = f"{avg_score:.2f}" if pd.notna(avg_score) else "—"
 
+n_down_with_comments = (down["Additional Comments"].astype(str).str.strip() != "").sum()
+n_peer_with_comments = (peer["Additional Comments"].astype(str).str.strip() != "").sum()
+
 kpis = [
     ("Total Feedback", len(me)),
-    ("Downward Feedback", len(down)),
-    ("Peer Feedback", len(peer)),
-    ("Unique Projects", down["Project_clean"].nunique()),
+    ("Downward", f"{len(down)}"),
+    ("Peer", f"{len(peer)}"),
+    ("Unique Projects", down["Project_clean"].replace("", np.nan).nunique()),
     ("Avg. Score (filtered)", f"{avg_score_str} / 5"),
 ]
 cols = st.columns(5)
@@ -375,14 +277,15 @@ for i, (lbl, val) in enumerate(kpis):
         )
 
 # =========================================================
-# 5. KNOWLEDGE & TECHNICAL SKILLS VERDICT (top placement)
+# 5. KNOWLEDGE & TECHNICAL SKILLS VERDICT
 # =========================================================
 st.markdown(
     '<div class="section-header">5 · KNOWLEDGE & TECHNICAL SKILLS VERDICT</div>',
     unsafe_allow_html=True,
 )
 
-tech_vals = me["Assessing Knowledge and Technical Skills"].dropna().astype(str).str.strip()
+tech_vals = me["Assessing Knowledge and Technical Skills"].astype(str).str.strip()
+tech_vals = tech_vals[tech_vals != ""]
 tech_counts = tech_vals.value_counts().to_dict()
 verdict = max(tech_counts, key=tech_counts.get) if tech_counts else "Not Assessed"
 n_assessed = sum(tech_counts.values())
@@ -395,13 +298,17 @@ st.markdown(
 )
 
 with st.expander("📖 View Detailed Verdict Narrative"):
+    reviewers = me[me["Assessing Knowledge and Technical Skills"].astype(str).str.strip() != ""]
+    reviewer_list = ", ".join(
+        f"{r['Feedback Giver Name']} ({r['Feedback Giver Global Grade']})"
+        for _, r in reviewers.iterrows()
+    )
     st.markdown(f"""
     Among the **{len(down)} downward feedback** received, **{n_assessed} reviewers** provided an explicit
-    rating on *Assessing Knowledge and Technical Skills*. **All {n_assessed} reviewers** — Iskandar Prakoso
-    (Senior Manager), Muhammad Sani (Manager), and Monica Adriana (Manager) — rated Gilang as
-    **"{verdict}"**.
+    rating on *Assessing Knowledge and Technical Skills*. All {n_assessed} reviewers — {reviewer_list} —
+    rated Gilang as **"{verdict}"**.
 
-    **Interpretation:** This indicates a **consistent and solid technical performance** at the Associate 1 grade level.
+    **Interpretation:** Consistent and solid technical performance at the Associate 1 level.
     No reviewer rated him below expectation, and his managers across multiple engagements
     (Jasa Marga ITE stream, EALM Telkomsel) corroborate the same view.
 
@@ -427,61 +334,45 @@ elif selected_client:
 
 st.caption(f"📌 Currently showing: **{filter_label}** · {len(down_f)} feedback record(s)")
 
-if len(down_f) == 0:
-    st.warning("No feedback records match the current filter.")
+if len(down_f) == 0 or down_f[[c + "_num" for c in RATING_COLS]].stack().empty:
+    st.warning("No rated feedback records match the current filter.")
 else:
-    avg_per_param = {
-        PARAM_SHORT[c]: down_f[c + "_num"].mean() for c in RATING_COLS
-    }
+    avg_per_param = {PARAM_SHORT[c]: down_f[c + "_num"].mean() for c in RATING_COLS}
     avg_df = pd.DataFrame(
         {"Parameter": list(avg_per_param.keys()), "Score": list(avg_per_param.values())}
     ).fillna(0)
 
     col1, col2 = st.columns([1.3, 1])
-
     with col1:
-        # Horizontal bar chart
         fig_bar = px.bar(
-            avg_df.sort_values("Score"),
-            x="Score",
-            y="Parameter",
-            orientation="h",
+            avg_df.sort_values("Score"), x="Score", y="Parameter", orientation="h",
             text=avg_df.sort_values("Score")["Score"].round(2),
             color_discrete_sequence=[PWC_ORANGE],
         )
         fig_bar.update_traces(
-            textposition="outside",
-            marker_line_color=PWC_DARK_ORANGE,
-            marker_line_width=1.5,
+            textposition="outside", marker_line_color=PWC_DARK_ORANGE, marker_line_width=1.5,
             textfont=dict(size=12, color=PWC_DARK, family="Calibri"),
         )
         fig_bar.update_layout(
             title=dict(
                 text="<b>Average Behaviour Score by Parameter</b><br>"
-                     "<span style='font-size:11px;color:#7D7D7D'>"
-                     "1 = Contradictory · 5 = Exemplified</span>",
+                     "<span style='font-size:11px;color:#7D7D7D'>1 = Contradictory · 5 = Exemplified</span>",
                 font=dict(size=14, color=PWC_DARK),
             ),
             xaxis=dict(range=[0, 5.4], title="Score", showgrid=True, gridcolor="#EEEEEE"),
-            yaxis=dict(title=""),
-            plot_bgcolor=PWC_LIGHT,
-            paper_bgcolor=PWC_WHITE,
-            height=380,
-            margin=dict(l=10, r=20, t=70, b=40),
+            yaxis=dict(title=""), plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE,
+            height=380, margin=dict(l=10, r=20, t=70, b=40),
             font=dict(family="Calibri", color=PWC_DARK),
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
     with col2:
-        # Radar chart
         fig_radar = go.Figure()
         fig_radar.add_trace(go.Scatterpolar(
             r=list(avg_per_param.values()) + [list(avg_per_param.values())[0]],
             theta=list(avg_per_param.keys()) + [list(avg_per_param.keys())[0]],
-            fill="toself",
-            fillcolor=f"rgba(208, 74, 2, 0.35)",
-            line=dict(color=PWC_DARK_ORANGE, width=2.5),
-            name="Score",
+            fill="toself", fillcolor="rgba(208, 74, 2, 0.35)",
+            line=dict(color=PWC_DARK_ORANGE, width=2.5), name="Score",
         ))
         fig_radar.update_layout(
             title=dict(text="<b>Competency Radar</b>", font=dict(size=14, color=PWC_DARK)),
@@ -489,26 +380,22 @@ else:
                 radialaxis=dict(visible=True, range=[0, 5], tickfont=dict(size=10)),
                 angularaxis=dict(tickfont=dict(size=11, color=PWC_DARK)),
             ),
-            showlegend=False,
-            height=380,
-            margin=dict(l=40, r=40, t=70, b=40),
-            paper_bgcolor=PWC_WHITE,
-            font=dict(family="Calibri", color=PWC_DARK),
+            showlegend=False, height=380, margin=dict(l=40, r=40, t=70, b=40),
+            paper_bgcolor=PWC_WHITE, font=dict(family="Calibri", color=PWC_DARK),
         )
         st.plotly_chart(fig_radar, use_container_width=True)
 
-    # Heatmap detail table
+    # Heatmap
     st.markdown(
         '<div class="section-header-dark">DETAIL · PER-ASSESSOR HEATMAP</div>',
         unsafe_allow_html=True,
     )
-
     heat_df = down_f[
-        ["Feedback Giver Name", "Feedback Giver Global Grade", "Project_clean", "Client_clean", "Hours_num"]
+        ["Feedback Giver Name", "Feedback Giver Global Grade", "Project_clean",
+         "Client_clean", "Hours_num"]
         + [c + "_num" for c in RATING_COLS]
     ].copy()
     heat_df.columns = ["Reviewer", "Grade", "Project", "Client", "Hours"] + list(PARAM_SHORT.values())
-
     score_color_map = {5: "#22A06B", 4: "#7DCC9D", 3: "#FFB600", 2: "#F08C5A", 1: "#E0301E"}
 
     def color_score(val):
@@ -527,7 +414,6 @@ else:
     )
     st.dataframe(styled, use_container_width=True, hide_index=True)
 
-    # Legend
     legend_html = '<div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">'
     for score, desc in [
         (5, "Exemplified & motivated others"),
@@ -540,8 +426,7 @@ else:
         fc = "white" if score in [5, 2, 1] else PWC_DARK
         legend_html += (
             f'<div style="background:{bg};color:{fc};padding:6px 12px;'
-            f'border-radius:4px;font-size:11px;font-weight:600">'
-            f'{score} · {desc}</div>'
+            f'border-radius:4px;font-size:11px;font-weight:600">{score} · {desc}</div>'
         )
     legend_html += "</div>"
     st.markdown(legend_html, unsafe_allow_html=True)
@@ -555,35 +440,26 @@ st.markdown(
 )
 
 col1, col2 = st.columns([1.3, 1])
-
 with col1:
     proj_hours = (
-        down.groupby("Project_clean")["Hours_num"].max().reset_index()
-        .query("Project_clean != ''")
+        down[down["Project_clean"] != ""]
+        .groupby("Project_clean")["Hours_num"].max().reset_index()
         .sort_values("Hours_num", ascending=True)
     )
     fig_h = px.bar(
-        proj_hours,
-        x="Hours_num",
-        y="Project_clean",
-        orientation="h",
+        proj_hours, x="Hours_num", y="Project_clean", orientation="h",
         text=proj_hours["Hours_num"].round(0).astype(int).map("{:,}".format),
         color_discrete_sequence=[PWC_DARK_ORANGE],
     )
     fig_h.update_traces(
-        textposition="outside",
-        marker_line_color=PWC_DARK,
-        marker_line_width=1,
+        textposition="outside", marker_line_color=PWC_DARK, marker_line_width=1,
         textfont=dict(size=11, color=PWC_DARK),
     )
     fig_h.update_layout(
         title=dict(text="<b>Project Hours YTD by Engagement</b>", font=dict(size=14, color=PWC_DARK)),
         xaxis=dict(title="Hours", showgrid=True, gridcolor="#EEEEEE"),
-        yaxis=dict(title=""),
-        plot_bgcolor=PWC_LIGHT,
-        paper_bgcolor=PWC_WHITE,
-        height=400,
-        margin=dict(l=10, r=60, t=60, b=40),
+        yaxis=dict(title=""), plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE,
+        height=400, margin=dict(l=10, r=60, t=60, b=40),
         font=dict(family="Calibri", color=PWC_DARK),
     )
     st.plotly_chart(fig_h, use_container_width=True)
@@ -592,10 +468,7 @@ with col2:
     grade_counts = down["Feedback Giver Global Grade"].value_counts().reset_index()
     grade_counts.columns = ["Grade", "Count"]
     fig_g = px.pie(
-        grade_counts,
-        values="Count",
-        names="Grade",
-        hole=0.55,
+        grade_counts, values="Count", names="Grade", hole=0.55,
         color_discrete_sequence=[PWC_ORANGE, PWC_DARK_ORANGE, PWC_YELLOW, PWC_RED, PWC_GREY, PWC_DARK],
     )
     fig_g.update_traces(
@@ -605,18 +478,15 @@ with col2:
     )
     fig_g.update_layout(
         title=dict(text="<b>Downward Feedback Givers by Grade</b>", font=dict(size=14, color=PWC_DARK)),
-        height=400,
-        showlegend=True,
+        height=400, showlegend=True,
         legend=dict(orientation="v", x=1.02, y=0.5, font=dict(size=10)),
-        paper_bgcolor=PWC_WHITE,
-        margin=dict(l=10, r=10, t=60, b=40),
+        paper_bgcolor=PWC_WHITE, margin=dict(l=10, r=10, t=60, b=40),
         font=dict(family="Calibri", color=PWC_DARK),
     )
     st.plotly_chart(fig_g, use_container_width=True)
 
-# Insights bullets
 total_hours = proj_hours["Hours_num"].sum()
-top_proj = proj_hours.iloc[-1]
+top_proj = proj_hours.iloc[-1] if len(proj_hours) else None
 n_director = int(grade_counts.loc[grade_counts["Grade"] == "Director", "Count"].sum())
 n_sm = int(grade_counts.loc[grade_counts["Grade"] == "Senior Manager", "Count"].sum())
 n_mgr = int(grade_counts.loc[grade_counts["Grade"] == "Manager", "Count"].sum())
@@ -625,25 +495,24 @@ short_eng = (proj_hours["Hours_num"] <= 50).sum()
 
 insights = [
     f"📊 <b>Total downward engagement coverage:</b> ~{int(total_hours):,} hours across {len(proj_hours)} unique project(s).",
-    f"🏆 <b>Largest engagement:</b> '{top_proj['Project_clean']}' with {int(top_proj['Hours_num']):,} hours — indicates deep, long-running involvement.",
+    f"🏆 <b>Largest engagement:</b> '{top_proj['Project_clean']}' with {int(top_proj['Hours_num']):,} hours — indicates deep, long-running involvement." if top_proj is not None else "",
     f"⏱️ <b>Engagement mix:</b> {long_eng} long-duration project(s) (≥500 hrs) and {short_eng} short-touchpoint project(s) (≤50 hrs) — both <i>depth</i> and <i>breadth</i> exposure.",
     f"👥 <b>Reviewer seniority:</b> {n_director} Director · {n_sm} Senior Manager · {n_mgr} Manager — feedback comes from a robust, senior reviewer pool, lending high credibility.",
     "📈 <b>Diverse client base</b> across Assurance & Advisory (Danantara, Jasa Marga, Telkomsel) supports breadth-of-experience narrative for promotion readiness.",
 ]
 for ins in insights:
-    st.markdown(f'<div class="insight-card">{ins}</div>', unsafe_allow_html=True)
+    if ins:
+        st.markdown(f'<div class="insight-card">{ins}</div>', unsafe_allow_html=True)
 
 # =========================================================
-# 4. QUALITATIVE INSIGHTS — STRENGTHS & IMPROVEMENTS
+# 4. STRENGTHS & AREAS TO IMPROVE
 # =========================================================
 st.markdown(
     '<div class="section-header">4 · QUALITATIVE INSIGHTS — STRENGTHS & AREAS TO IMPROVE</div>',
     unsafe_allow_html=True,
 )
 
-all_text = " ".join(
-    [str(c) for c in me["Additional Comments"].dropna() if str(c).strip() and str(c) != "nan"]
-).lower()
+all_text = " ".join([str(c) for c in me["Additional Comments"] if str(c).strip()]).lower()
 
 strength_themes = {
     "Commitment & Ownership": ["commit", "ownership", "responsib", "accountab", "dedicat", "reliab", "disciplin"],
@@ -657,8 +526,8 @@ strength_themes = {
     "Professionalism": ["professional", "positive", "enthusi", "attitude"],
 }
 improvement_themes = {
-    "Communication & Writing": ["communication", "writing", "writ"],
-    "PPT / Presentation Skills": ["ppt", "presentation", "slide"],
+    "Communication & Writing": ["communication skill", "writing", "writ"],
+    "PPT / Presentation Skills": ["ppt", "presentation skill", "slide", "ppt-making"],
     "Strategic Planning": ["strategic"],
 }
 
@@ -669,60 +538,37 @@ strengths = {k: count_theme(all_text, kws) for k, kws in strength_themes.items()
 improvements = {k: count_theme(all_text, kws) for k, kws in improvement_themes.items()}
 
 col1, col2 = st.columns([1.3, 1])
-
 with col1:
-    s_df = pd.DataFrame(
-        {"Theme": list(strengths.keys()), "Mentions": list(strengths.values())}
-    ).sort_values("Mentions", ascending=True)
-    fig_s = px.bar(
-        s_df, x="Mentions", y="Theme", orientation="h",
-        text="Mentions", color_discrete_sequence=[PWC_GREEN],
-    )
-    fig_s.update_traces(
-        textposition="outside",
-        marker_line_color="#1B7A52", marker_line_width=1,
-        textfont=dict(size=11, color=PWC_DARK, family="Calibri"),
-    )
+    s_df = pd.DataFrame({"Theme": list(strengths.keys()), "Mentions": list(strengths.values())}).sort_values("Mentions", ascending=True)
+    fig_s = px.bar(s_df, x="Mentions", y="Theme", orientation="h", text="Mentions", color_discrete_sequence=[PWC_GREEN])
+    fig_s.update_traces(textposition="outside", marker_line_color="#1B7A52", marker_line_width=1, textfont=dict(size=11, color=PWC_DARK, family="Calibri"))
     fig_s.update_layout(
         title=dict(text="<b>Common Strengths (Theme Frequency)</b>", font=dict(size=14, color=PWC_DARK)),
-        xaxis=dict(title="Mentions", showgrid=True, gridcolor="#EEEEEE"),
-        yaxis=dict(title=""),
-        plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE,
-        height=420, margin=dict(l=10, r=40, t=60, b=40),
+        xaxis=dict(title="Mentions", showgrid=True, gridcolor="#EEEEEE"), yaxis=dict(title=""),
+        plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE, height=420, margin=dict(l=10, r=40, t=60, b=40),
         font=dict(family="Calibri", color=PWC_DARK),
     )
     st.plotly_chart(fig_s, use_container_width=True)
 
 with col2:
-    i_df = pd.DataFrame(
-        {"Theme": list(improvements.keys()), "Mentions": list(improvements.values())}
-    ).sort_values("Mentions", ascending=True)
-    fig_i = px.bar(
-        i_df, x="Mentions", y="Theme", orientation="h",
-        text="Mentions", color_discrete_sequence=[PWC_RED],
-    )
-    fig_i.update_traces(
-        textposition="outside",
-        marker_line_color="#A02216", marker_line_width=1,
-        textfont=dict(size=11, color=PWC_DARK, family="Calibri"),
-    )
+    i_df = pd.DataFrame({"Theme": list(improvements.keys()), "Mentions": list(improvements.values())}).sort_values("Mentions", ascending=True)
+    fig_i = px.bar(i_df, x="Mentions", y="Theme", orientation="h", text="Mentions", color_discrete_sequence=[PWC_RED])
+    fig_i.update_traces(textposition="outside", marker_line_color="#A02216", marker_line_width=1, textfont=dict(size=11, color=PWC_DARK, family="Calibri"))
     fig_i.update_layout(
         title=dict(text="<b>Areas to Improve (Theme Frequency)</b>", font=dict(size=14, color=PWC_DARK)),
-        xaxis=dict(title="Mentions", showgrid=True, gridcolor="#EEEEEE"),
-        yaxis=dict(title=""),
-        plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE,
-        height=420, margin=dict(l=10, r=40, t=60, b=40),
+        xaxis=dict(title="Mentions", showgrid=True, gridcolor="#EEEEEE"), yaxis=dict(title=""),
+        plot_bgcolor=PWC_LIGHT, paper_bgcolor=PWC_WHITE, height=420, margin=dict(l=10, r=40, t=60, b=40),
         font=dict(family="Calibri", color=PWC_DARK),
     )
     st.plotly_chart(fig_i, use_container_width=True)
 
-# Narrative summaries
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown("""
+    st.markdown(f"""
     <div class="strength-card">
-    <b style="color:#22A06B;font-size:14px">✅ STRENGTHS SUMMARY</b><br><br>
-    Across all <b>14 written feedback responses</b>, Gilang is most consistently praised for:<br><br>
+    <b style="color:{PWC_GREEN};font-size:14px">✅ STRENGTHS SUMMARY</b><br><br>
+    Across <b>{n_down_with_comments + n_peer_with_comments} written feedback responses</b>
+    ({n_down_with_comments} downward + {n_peer_with_comments} peer), Gilang is most consistently praised for:<br><br>
     <b>1. Collaboration & Teamwork</b> — supportive, inclusive, easy to work with.<br>
     <b>2. Commitment, Ownership & Accountability</b> — reliable, disciplined, delivers on tight deadlines.<br>
     <b>3. Leadership Presence</b> — even as a peer, seen as a 'role model' and effective Team Lead (PwC Ramadhan content team).<br>
@@ -733,12 +579,12 @@ with col1:
     """, unsafe_allow_html=True)
 
 with col2:
-    st.markdown("""
+    st.markdown(f"""
     <div class="improve-card">
-    <b style="color:#E0301E;font-size:14px">🎯 AREAS TO IMPROVE</b><br><br>
+    <b style="color:{PWC_RED};font-size:14px">🎯 AREAS TO IMPROVE</b><br><br>
     Development feedback is limited but consistent:<br><br>
     <b>1. Communication & Writing skills</b> — improving written communication
-    (per Manager Monica Adriana).<br><br>
+    (per Manager Monica Adriana on Telkomsel EALM).<br><br>
     <b>2. Presentation / PPT-making skills</b> — to elevate client-facing deliverables.<br><br>
     <b>3. Strategic Planning</b> — develop ability to lead complex projects end-to-end
     (per peer Kelvin Tioputra).<br><br>
@@ -752,24 +598,41 @@ with col2:
 # =========================================================
 st.markdown('<div class="section-header-dark">📝 ALL FEEDBACK COMMENTS</div>', unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs([f"⬇️ Downward ({len(down)})", f"↔️ Peer ({len(peer)})"])
+tab1, tab2 = st.tabs([
+    f"⬇️ Downward ({n_down_with_comments} comments / {len(down)} total)",
+    f"↔️ Peer ({n_peer_with_comments} comments / {len(peer)} total)"
+])
 
 def render_comments(df_subset, css_class):
-    has_any = False
+    rendered = 0
+    skipped = 0
     for _, r in df_subset.iterrows():
-        c = r["Additional Comments"]
-        if pd.notna(c) and str(c).strip() and str(c) != "nan":
-            has_any = True
-            project = r["Project_clean"] or "—"
+        c = str(r["Additional Comments"]).strip()
+        project = r["Project_clean"] or "—"
+        if c:
             st.markdown(
                 f'<div class="{css_class}">'
                 f'<div class="comment-meta">{r["Feedback Giver Name"]} '
                 f'· {r["Feedback Giver Global Grade"]} · Project: {project}</div>'
-                f'{str(c).strip()}</div>',
+                f'{c}</div>',
                 unsafe_allow_html=True,
             )
-    if not has_any:
+            rendered += 1
+        else:
+            skipped += 1
+            if show_empty_comments:
+                st.markdown(
+                    f'<div class="empty-comment">'
+                    f'<b>{r["Feedback Giver Name"]}</b> '
+                    f'({r["Feedback Giver Global Grade"]}) · Project: {project} — '
+                    f'<i>Provided ratings only, no written comment.</i></div>',
+                    unsafe_allow_html=True,
+                )
+    if rendered == 0 and not show_empty_comments:
         st.info("No written comments available in this category.")
+    if skipped > 0 and not show_empty_comments:
+        st.caption(f"💡 {skipped} reviewer(s) provided ratings only without written comment. "
+                   f"Toggle 'Show reviewers with no written comment' in the sidebar to see them.")
 
 with tab1:
     render_comments(down, "comment-down")
@@ -784,7 +647,7 @@ st.markdown("---")
 st.markdown(
     f'<div style="text-align:center;color:{PWC_GREY};font-size:11px;padding:12px">'
     f"CRT Dashboard prepared for <b>Gilang Catur</b> · Performance Year 2026 · "
-    f"Source: Leader Report Extract · 🔒 Confidential — for Career Coach use only"
+    f"🔒 Confidential — for Career Coach use only"
     f"</div>",
     unsafe_allow_html=True,
 )
