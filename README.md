@@ -1,55 +1,49 @@
-# CRT Dashboard — Live Online Version
+# CRT Dashboard — Live Online Version (FINAL)
 
 Interactive Career Review Touchpoint dashboard for **Gilang Catur** (PY2026).
-Built with Streamlit + Plotly, styled in PwC orange/dark theme.
+Built with Streamlit + Plotly · PwC orange/dark theme.
 
-## 🚀 Deploy in 5 minutes (FREE — Streamlit Community Cloud)
+## ✨ What's NEW in this final version
 
-### Step 1 — Create a GitHub repo
-1. Go to https://github.com → click **New repository**
-2. Name it e.g. `crt-dashboard-gilang`
-3. Set to **Private** (recommended, since data is confidential)
-4. Click **Create repository**
+1. ✅ **Corrected dataset** — assessor feedback and Gilang's self-description are now properly separated. No more mismatch!
+2. 🎤 **CRT Meeting Live Notes module** — type assessor comments live during the meeting
+3. 🔍 **Analyze button** — instantly extracts strength + improvement themes from your typed notes
+4. 📊 **Auto-generated charts** — bar charts of themes + sentiment gauge
+5. 🤖 **AI-style summary** — automatic top-3 themes + coach recommendation
+6. 💾 **Download button** — exports full meeting record as Markdown
+7. 👁️ **Sidebar toggles** — show/hide empty reviewers, show/hide self-descriptions
 
-### Step 2 — Upload these 3 files to the repo
+## 🚀 Deploy in 5 minutes (FREE)
+
+### Step 1 — Create a private GitHub repo
+1. Go to https://github.com → **New repository** → set to **Private**
+2. Name e.g. `crt-dashboard-gilang`
+
+### Step 2 — Upload these 3 files
 - `app.py`
+- `crt_data.csv` (the cleaned dataset)
 - `requirements.txt`
-- `Leader_Report_Extract.xlsx` (rename your source file to this exact name)
-
-You can drag-and-drop them in GitHub's web UI ("Add file" → "Upload files").
 
 ### Step 3 — Deploy on Streamlit Cloud
-1. Go to https://share.streamlit.io
-2. Sign in with your GitHub account
-3. Click **New app** → select your repo → branch `main` → main file `app.py`
-4. Click **Deploy** ✅
+1. https://share.streamlit.io → sign in with GitHub
+2. **New app** → select your repo → branch `main` → main file = `app.py`
+3. **Deploy** ✅ → get a public URL like `https://your-app.streamlit.app`
 
-In ~2 minutes you'll get a public URL like:
-`https://crt-dashboard-gilang.streamlit.app`
-
-You can share this link with anyone (or keep it private — Streamlit Cloud lets you restrict by email).
-
----
-
-## 🖥️ Run locally (optional)
-
+## 🖥️ Run locally
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
-Then open http://localhost:8501
 
----
+## 📊 Sections in the dashboard
 
-## 📊 What's inside
-
-1. **Coachee Profile** — Bio card (Name, ID, PY, Grade, LoS, Office, Coach, Leader)
-2. **At-a-Glance KPIs** — Live updating counters
-3. **Behaviour Assessment Deep Dive** — Bar chart + Radar chart + per-assessor heatmap
-   - 🎛️ **Interactive sidebar filter**: All / By Project / By Client
-4. **Project Engagement & Reviewer Profile** — Hours bar chart + grade donut + 5 insight bullets
-5. **Qualitative Insights** — Strength themes (green) + Improvement themes (red) + narrative summaries
-6. **Knowledge & Technical Skills Verdict** — Big banner: "In line with expectations"
-7. **All Comments** — Tabbed view (Downward / Peer) with full feedback text
+1. **Coachee Profile** — bio cards
+2. **At-a-Glance** — 5 live KPIs
+3. **Knowledge & Technical Skills Verdict** — green banner
+4. **Behaviour Assessment Deep Dive** — bar + radar + heatmap (filterable)
+5. **Project Engagement & Reviewer Profile** — hours bar + grade donut + insights
+6. **Strengths & Improvements** — themes from written feedback
+7. **All Comments** — tabbed (Downward / Peer)
+8. **🎤 CRT Meeting Live Notes** — interactive note-taking + AI analysis 🆕
 
 🔒 **Confidential** — for Career Coach use only.
